@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo de Correlacionar Cartas</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; background: #f4f4f4; }
+    h1 { margin: 20px; }
+    .game-board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px;
+    }
+    .card {
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      width: 200px;
+      height: 260px;
+      background: #fff;
+      padding: 5px;
+      box-shadow: 2px 2px 6px #aaa;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .matched {
+      border: 2px solid green;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo de Correlacionar Cartas</h1>
+  <div class="game-board" id="gameBoard"></div>
+  <div id="result"></div>
+
+  <script>
+    const imagens = [
+      "pair1_a.jpg", "pair1_b.jpg",
+      "pair2_a.jpg", "pair2_b.jpg",
+      "pair3_a.jpg", "pair3_b.jpg",
+      "pair4_a.jpg", "pair4_b.jpg",
+      "pair5_a.jpg", "pair5_b.jpg",
+      "pair6_a.jpg", "pair6_b.jpg",
+      "pair7_a.jpg", "pair7_b.jpg",
+      "pair8_a.jpg", "pair8_b.jpg"
+    ];
+
+    const embaralhadas = imagens.sort(() => 0.5 - Math.random());
+    const tabuleiro = document.getElementById("gameBoard");
+
+    let selecionadas = [];
+
+    embaralhadas.forEach(nome => {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.dataset.nome = nome.split("_")[0];
+      div.innerHTML = `<img src="cartas_correladas_final/${nome}" alt="${nome}">`;
+      div.onclick = () => selecionar(div);
+      tabuleiro.appendChild(div);
+    });
+
+    function selecionar(carta) {
+      if (carta.classList.contains("matched") || selecionadas.includes(carta)) return;
+      selecionadas.push(carta);
+      carta.style.border = "2px solid blue";
+
+      if (selecionadas.length === 2) {
+        const [c1, c2] = selecionadas;
+        if (c1.dataset.nome === c2.dataset.nome && c1 !== c2) {
+          c1.classList.add("matched");
+          c2.classList.add("matched");
+          document.getElementById("result").textContent = "Par correto!";
+        } else {
+          document.getElementById("result").textContent = "Tente novamente.";
+        }
+        setTimeout(() => {
+          c1.style.border = c2.style.border = "2px solid #ccc";
+          selecionadas = [];
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>

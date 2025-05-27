@@ -109,23 +109,23 @@
       if (selecionadas.length === 2) {
         const [c1, c2] = selecionadas;
         if (c1.dataset.nome === c2.dataset.nome && c1 !== c2) {
-          c1.classList.add("matched");
-          c2.classList.add("matched");
           document.getElementById("result").textContent = "Par correto!";
           audioAcerto.play();
           acertos++;
           document.getElementById("score").textContent = `Acertos: ${acertos}`;
           setTimeout(() => {
-            carregarTabuleiro();
-          }, 1000);
+            c1.remove();
+            c2.remove();
+            selecionadas = [];
+          }, 600);
         } else {
           document.getElementById("result").textContent = "Tente novamente.";
           audioErro.play();
+          setTimeout(() => {
+            c1.style.border = c2.style.border = "2px solid #ccc";
+            selecionadas = [];
+          }, 1000);
         }
-        setTimeout(() => {
-          c1.style.border = c2.style.border = "2px solid #ccc";
-          selecionadas = [];
-        }, 1000);
       }
     }
 

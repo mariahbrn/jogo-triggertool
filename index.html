@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>Jogo de Correlacionar Cartas</title>
   <style>
-    body { font-family: sans-serif; text-align: center; background: #f4f4f4; }
+    body { font-family: sans-serif; text-align: center; background: #f4f4f4; margin: 0; padding: 0; }
     h1 { margin: 20px; }
     .game-board {
       display: flex;
@@ -36,15 +36,38 @@
       border: 2px solid green;
       opacity: 0.6;
     }
+    #result {
+      position: relative;
+      top: 0;
+      margin: 10px auto;
+      background: rgba(255,255,255,0.95);
+      padding: 10px 20px;
+      border: 2px solid #444;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 18px;
+      max-width: 500px;
+    }
+    #score {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
+  <div id="result">Bem-vindo! Faça uma correspondência.</div>
   <h1>Jogo de Correlacionar Cartas</h1>
   <div class="game-board" id="gameBoard"></div>
-  <div id="result"></div>
+  <div id="score">Acertos: 0</div>
+
+  <audio id="sound-correct" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b4f6d084db.mp3?filename=correct-2-46134.mp3"></audio>
+  <audio id="sound-wrong" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_e0f19a392e.mp3?filename=error-2-7184.mp3"></audio>
 
   <script>
-    const imagens = [
+    let acertos = 0;
+
+    const imagensOriginais = [
       "pair1_a.jpg", "pair1_b.jpg",
       "pair2_a.jpg", "pair2_b.jpg",
       "pair3_a.jpg", "pair3_b.jpg",
@@ -55,19 +78,28 @@
       "pair8_a.jpg", "pair8_b.jpg"
     ];
 
-    const embaralhadas = imagens.sort(() => 0.5 - Math.random());
-    const tabuleiro = document.getElementById("gameBoard");
+    function embaralhar(array) {
+      return array.sort(() => 0.5 - Math.random());
+    }
+
+    function carregarTabuleiro() {
+      const embaralhadas = embaralhar([...imagensOriginais]);
+      const tabuleiro = document.getElementById("gameBoard");
+      tabuleiro.innerHTML = "";
+
+      embaralhadas.forEach(nome => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.dataset.nome = nome.split("_")[0];
+        div.innerHTML = `<img src="cartas_correladas_final/${nome}" alt="${nome}">`;
+        div.onclick = () => selecionar(div);
+        tabuleiro.appendChild(div);
+      });
+    }
 
     let selecionadas = [];
-
-    embaralhadas.forEach(nome => {
-      const div = document.createElement("div");
-      div.className = "card";
-      div.dataset.nome = nome.split("_")[0];
-      div.innerHTML = `<img src="cartas_correladas_final/${nome}" alt="${nome}">`;
-      div.onclick = () => selecionar(div);
-      tabuleiro.appendChild(div);
-    });
+    const audioAcerto = document.getElementById("sound-correct");
+    const audioErro = document.getElementById("sound-wrong");
 
     function selecionar(carta) {
       if (carta.classList.contains("matched") || selecionadas.includes(carta)) return;
@@ -80,8 +112,15 @@
           c1.classList.add("matched");
           c2.classList.add("matched");
           document.getElementById("result").textContent = "Par correto!";
+          audioAcerto.play();
+          acertos++;
+          document.getElementById("score").textContent = `Acertos: ${acertos}`;
+          setTimeout(() => {
+            carregarTabuleiro();
+          }, 1000);
         } else {
           document.getElementById("result").textContent = "Tente novamente.";
+          audioErro.play();
         }
         setTimeout(() => {
           c1.style.border = c2.style.border = "2px solid #ccc";
@@ -89,6 +128,8 @@
         }, 1000);
       }
     }
+
+    carregarTabuleiro();
   </script>
 </body>
 </html>
